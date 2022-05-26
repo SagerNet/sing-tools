@@ -9,7 +9,7 @@
 ## Install
 
 ```shell
-git clone https://github.com/SagerNet/sing-tools 
+git clone https://github.com/SagerNet/sing-tools sing
 cd sing
 
 cli/ss-server/install.sh
