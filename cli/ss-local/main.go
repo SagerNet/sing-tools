@@ -40,11 +40,12 @@ import (
 const udpTimeout = 5 * 60
 
 type flags struct {
-	Server      string `json:"server"`
-	ServerPort  uint16 `json:"server_port"`
-	Bind        string `json:"local_address"`
-	LocalPort   uint16 `json:"local_port"`
-	Password    string `json:"password"`
+	Server     string `json:"server"`
+	ServerPort uint16 `json:"server_port"`
+	Bind       string `json:"local_address"`
+	LocalPort  uint16 `json:"local_port"`
+	Password   string `json:"password"`
+	// deprecated
 	Key         string `json:"key"`
 	Method      string `json:"method"`
 	TCPFastOpen bool   `json:"fast_open"`
@@ -168,6 +169,9 @@ func newClient(f *flags) (*client, error) {
 	if f.Method == shadowsocks.MethodNone {
 		c.method = shadowsocks.NewNone()
 	} else {
+		if f.Key != "" {
+			f.Password = f.Key
+		}
 		method, err := shadowimpl.FetchMethod(f.Method, f.Password)
 		if err != nil {
 			return nil, err

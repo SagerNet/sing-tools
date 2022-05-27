@@ -34,9 +34,10 @@ type flags struct {
 	Bind       string `json:"local_address"`
 	LocalPort  uint16 `json:"local_port"`
 	Password   string `json:"password"`
-	Key        string `json:"key"`
-	Method     string `json:"method"`
-	LogLevel   string `json:"log_level"`
+	// deprecated
+	Key      string `json:"key"`
+	Method   string `json:"method"`
+	LogLevel string `json:"log_level"`
 }
 
 var configPath string
@@ -128,6 +129,10 @@ func newServer(f *flags) (*server, error) {
 		return nil, E.New("missing method")
 	}
 
+	if f.Key != "" {
+		f.Password = f.Key
+	}
+
 	if f.Method == shadowsocks.MethodNone {
 		s.service = shadowsocks.NewNoneService(udpTimeout, s)
 	} else if common.Contains(shadowaead.List, f.Method) {
@@ -137,7 +142,7 @@ func newServer(f *flags) (*server, error) {
 		}
 		s.service = service
 	} else if common.Contains(shadowaead_2022.List, f.Method) {
-		service, err := shadowaead_2022.NewServiceWithPassword(f.Method, f.Key, udpTimeout, s)
+		service, err := shadowaead_2022.NewServiceWithPassword(f.Method, f.Password, udpTimeout, s)
 		if err != nil {
 			return nil, err
 		}
