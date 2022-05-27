@@ -11,8 +11,8 @@ require (
 	github.com/openacid/low v0.1.21
 	github.com/oschwald/geoip2-golang v1.7.0
 	github.com/refraction-networking/utls v1.1.0
-	github.com/sagernet/sing v0.0.0-20220525123305-5b49366f6e34
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220526074247-4aa429eef16d
+	github.com/sagernet/sing v0.0.0-20220527064225-7abc98fdea29
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220527064541-fa7811b49c41
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/ulikunitz/xz v0.5.10
@@ -25,8 +25,6 @@ require (
 
 require (
 	github.com/adrg/xdg v0.4.0 // indirect
-	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
-	github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
 	github.com/cheekybits/genny v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
