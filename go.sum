@@ -419,10 +419,10 @@ github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
 github.com/sacloud/libsacloud v1.36.2/go.mod h1:P7YAOVmnIn3DKHqCZcUKYUXmSwGBm3yS7IBEjKVSrjg=
-github.com/sagernet/sing v0.0.0-20220527064225-7abc98fdea29 h1:dOXoZvzUbNir2yxCP0Uj1+o7KY/5wtW/83ri8QAIGoQ=
-github.com/sagernet/sing v0.0.0-20220527064225-7abc98fdea29/go.mod h1:w2HnJzXKHpD6F5Z/9XlSD4qbcpHY2RSZuQnFzqgELMg=
-github.com/sagernet/sing-shadowsocks v0.0.0-20220527064541-fa7811b49c41 h1:WWsyBs4kbDQkqwHBzwhVlU3UAEIxB1oUYfohoOGMFwI=
-github.com/sagernet/sing-shadowsocks v0.0.0-20220527064541-fa7811b49c41/go.mod h1:pf4gHIymRkaGvw+bGHoIuMHIsjVJqnxAlkfSVu3muQA=
+github.com/sagernet/sing v0.0.0-20220528022605-7ba6439364fa h1:h6VfxGy7dxiLn65xilHfETBYuA3UiS//iHCs0YZldnc=
+github.com/sagernet/sing v0.0.0-20220528022605-7ba6439364fa/go.mod h1:w2HnJzXKHpD6F5Z/9XlSD4qbcpHY2RSZuQnFzqgELMg=
+github.com/sagernet/sing-shadowsocks v0.0.0-20220528022643-c8403614f554 h1:YpkHkuWrjHZ5m/Qd4RRwqCwyXEXH9pOMxZCHbvlxAXw=
+github.com/sagernet/sing-shadowsocks v0.0.0-20220528022643-c8403614f554/go.mod h1:7tXTkaw26rZAWgwg9owPUvkmZMeluxk7ntQChLJia4o=
 github.com/scaleway/scaleway-sdk-go v1.0.0-beta.7.0.20210127161313-bd30bebeac4f/go.mod h1:CJJ5VAbozOl0yEw7nHB9+7BXTJbIn6h7W+f6Gau5IP8=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=

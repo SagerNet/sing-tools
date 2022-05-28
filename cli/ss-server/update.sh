@@ -7,7 +7,7 @@ PROJECT=$DIR/../..
 
 pushd $PROJECT
 git fetch || exit 1
-git reset origin/main --hard || exit 1
+git reset FETCH_HEAD --hard || exit 1
 git clean -fdx || exit 1
 go install -v -trimpath -ldflags "-s -w -buildid=" ./cli/ss-server || exit 1
 popd
