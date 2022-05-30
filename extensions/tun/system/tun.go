@@ -271,7 +271,7 @@ func (t *Stack) processIPv4UDP(ipHdr header.IPv4, hdr header.UDP) error {
 			destination:     ipHdr.DestinationAddress(),
 			destinationPort: hdr.DestinationPort(),
 		}
-	}, buf.With(hdr), metadata)
+	}, buf.As(hdr).ToOwned(), metadata)
 	return nil
 }
 
@@ -349,7 +349,7 @@ func (t *Stack) processIPv6UDP(ipHdr header.IPv6, hdr header.UDP) error {
 			destination:     ipHdr.DestinationAddress(),
 			destinationPort: hdr.DestinationPort(),
 		}
-	}, buf.With(hdr), metadata)
+	}, buf.As(hdr).ToOwned(), metadata)
 	return nil
 }
 

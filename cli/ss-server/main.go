@@ -15,7 +15,6 @@ import (
 	"github.com/sagernet/sing-shadowsocks/shadowaead_2022"
 	_ "github.com/sagernet/sing-tools/extensions/log"
 	"github.com/sagernet/sing/common"
-	"github.com/sagernet/sing/common/buf"
 	"github.com/sagernet/sing/common/bufio"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
@@ -161,16 +160,12 @@ func newServer(f *flags) (*server, error) {
 	} else {
 		bind = netip.IPv6Unspecified()
 	}
-	s.tcpIn = tcp.NewTCPListener(netip.AddrPortFrom(bind, f.ServerPort), s)
-	s.udpIn = udp.NewUDPListener(netip.AddrPortFrom(bind, f.ServerPort), s)
+	s.tcpIn = tcp.NewTCPListener(netip.AddrPortFrom(bind, f.ServerPort), s.service)
+	s.udpIn = udp.NewUDPListener(netip.AddrPortFrom(bind, f.ServerPort), s.service)
 	return s, nil
 }
 
 func (s *server) NewConnection(ctx context.Context, conn net.Conn, metadata M.Metadata) error {
-	if metadata.Protocol != "shadowsocks" {
-		logrus.Trace("inbound raw TCP from ", metadata.Source)
-		return s.service.NewConnection(ctx, conn, metadata)
-	}
 	logrus.Info("inbound TCP ", conn.RemoteAddr(), " ==> ", metadata.Destination)
 	destConn, err := N.SystemDialer.DialContext(ctx, "tcp", metadata.Destination)
 	if err != nil {
@@ -186,11 +181,6 @@ func (s *server) NewPacketConnection(ctx context.Context, conn N.PacketConn, met
 		return err
 	}
 	return bufio.CopyNetPacketConn(ctx, conn, udpConn)
-}
-
-func (s *server) NewPacket(ctx context.Context, conn N.PacketConn, buffer *buf.Buffer, metadata M.Metadata) error {
-	logrus.Trace("inbound raw UDP from ", metadata.Source)
-	return s.service.NewPacket(ctx, conn, buffer, metadata)
 }
 
 func (s *server) HandleError(err error) {
