@@ -31,8 +31,11 @@ import (
 	"github.com/sagernet/sing/common/redir"
 	"github.com/sagernet/sing/common/rw"
 	"github.com/sagernet/sing/common/task"
+	"github.com/sagernet/sing/common/udpnat"
 	"github.com/sagernet/sing/transport/mixed"
 	"github.com/sagernet/sing/transport/system"
+	"github.com/sagernet/sing/transport/tcp"
+	"github.com/sagernet/sing/transport/udp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -53,6 +56,7 @@ type flags struct {
 	Transproxy  string `json:"transproxy"`
 	FWMark      int    `json:"fwmark"`
 	Bypass      string `json:"bypass"`
+	Tunnel      string `json:"tunnel"`
 	ConfigFile  string
 }
 
@@ -81,8 +85,8 @@ func main() {
 	supportedCiphers = append(supportedCiphers, shadowstream.List...)
 
 	command.Flags().StringVarP(&f.Method, "encrypt-method", "m", "", "Store the cipher.\n\nSupported ciphers:\n\n"+strings.Join(supportedCiphers, "\n"))
-	command.Flags().BoolVar(&f.TCPFastOpen, "fast-open", false, `Enable TCP fast open.
-Only available with Linux kernel > 3.7.0.`)
+	command.Flags().BoolVar(&f.TCPFastOpen, "fast-open", false, `Enable TCP fast open.`)
+	command.Flags().StringVar(&f.Tunnel, "tunnel", "", "Enable tunnel mode.")
 	command.Flags().StringVarP(&f.Transproxy, "transproxy", "t", "", "Enable transparent proxy support. [possible values: redirect, tproxy]")
 	command.Flags().IntVar(&f.FWMark, "fwmark", 0, "Store outbound socket mark.")
 	command.Flags().StringVar(&f.Bypass, "bypass", "", "Store bypass country.")
@@ -94,16 +98,41 @@ Only available with Linux kernel > 3.7.0.`)
 	}
 }
 
-type client struct {
-	*mixed.Listener
+type Client struct {
+	mixIn *mixed.Listener
+	tcpIn *tcp.Listener
+	udpIn *udp.Listener
 	*geosite.Matcher
-	server M.Socksaddr
-	method shadowsocks.Method
-	dialer net.Dialer
-	bypass string
+	server    M.Socksaddr
+	method    shadowsocks.Method
+	dialer    net.Dialer
+	bypass    string
+	isTunnel  bool
+	tunnel    M.Socksaddr
+	tunnelNat *udpnat.Service[netip.AddrPort]
 }
 
-func newClient(f *flags) (*client, error) {
+func (c *Client) Start() error {
+	if !c.isTunnel {
+		return c.mixIn.Start()
+	} else {
+		err := c.tcpIn.Start()
+		if err != nil {
+			return err
+		}
+		return c.udpIn.Start()
+	}
+}
+
+func (c *Client) Close() error {
+	if !c.isTunnel {
+		return c.mixIn.Close()
+	} else {
+		return common.Close(c.tcpIn, c.udpIn)
+	}
+}
+
+func newClient(f *flags) (*Client, error) {
 	if f.ConfigFile != "" {
 		configFile, err := ioutil.ReadFile(f.ConfigFile)
 		if err != nil {
@@ -138,12 +167,16 @@ func newClient(f *flags) (*client, error) {
 		if flagsNew.Transproxy != "" && f.Transproxy == "" {
 			f.Transproxy = flagsNew.Transproxy
 		}
+		if flagsNew.Tunnel != "" && f.Tunnel == "" {
+			f.Tunnel = flagsNew.Tunnel
+		}
 		if flagsNew.TCPFastOpen {
 			f.TCPFastOpen = true
 		}
 		if flagsNew.Verbose {
 			f.Verbose = true
 		}
+
 	}
 
 	if f.Verbose {
@@ -158,7 +191,7 @@ func newClient(f *flags) (*client, error) {
 		return nil, E.New("missing method")
 	}
 
-	c := &client{
+	c := &Client{
 		server: M.ParseSocksaddrHostPort(f.Server, f.ServerPort),
 		bypass: f.Bypass,
 		dialer: net.Dialer{
@@ -202,30 +235,39 @@ func newClient(f *flags) (*client, error) {
 		return nil
 	}
 
-	var transproxyMode redir.TransproxyMode
-	switch f.Transproxy {
-	case "redirect":
-		transproxyMode = redir.ModeRedirect
-	case "tproxy":
-		transproxyMode = redir.ModeTProxy
-	case "":
-		transproxyMode = redir.ModeDisabled
-	default:
-		return nil, E.New("unknown transproxy mode ", f.Transproxy)
-	}
-
-	var bind netip.Addr
+	var bindAddr netip.Addr
 	if f.Bind != "" {
 		addr, err := netip.ParseAddr(f.Bind)
 		if err != nil {
 			return nil, E.Cause(err, "bad local address")
 		}
-		bind = addr
+		bindAddr = addr
 	} else {
-		bind = netip.IPv6Unspecified()
+		bindAddr = netip.IPv6Unspecified()
 	}
+	bind := netip.AddrPortFrom(bindAddr, f.LocalPort)
 
-	c.Listener = mixed.NewListener(netip.AddrPortFrom(bind, f.LocalPort), nil, transproxyMode, udpTimeout, c)
+	if f.Tunnel == "" {
+		var transproxyMode redir.TransproxyMode
+		switch f.Transproxy {
+		case "redirect":
+			transproxyMode = redir.ModeRedirect
+		case "tproxy":
+			transproxyMode = redir.ModeTProxy
+		case "":
+			transproxyMode = redir.ModeDisabled
+		default:
+			return nil, E.New("unknown transproxy mode ", f.Transproxy)
+		}
+
+		c.mixIn = mixed.NewListener(bind, nil, transproxyMode, udpTimeout, c)
+	} else {
+		c.isTunnel = true
+		c.tunnel = M.ParseSocksaddr(f.Tunnel)
+		c.tcpIn = tcp.NewTCPListener(bind, c)
+		c.udpIn = udp.NewUDPListener(bind, c)
+		c.tunnelNat = udpnat.New[netip.AddrPort](500, c)
+	}
 
 	if f.Bypass != "" {
 		err := geoip.LoadMMDB("Country.mmdb")
@@ -272,7 +314,12 @@ func bypass(conn net.Conn, destination M.Socksaddr) error {
 	})
 }
 
-func (c *client) NewConnection(ctx context.Context, conn net.Conn, metadata M.Metadata) error {
+func (c *Client) NewConnection(ctx context.Context, conn net.Conn, metadata M.Metadata) error {
+	if c.isTunnel {
+		metadata.Protocol = "tunnel"
+		metadata.Destination = c.tunnel
+	}
+
 	if c.bypass != "" {
 		if metadata.Destination.Family().IsFqdn() {
 			if c.Match(metadata.Destination.Fqdn) {
@@ -315,7 +362,7 @@ func (c *client) NewConnection(ctx context.Context, conn net.Conn, metadata M.Me
 	return bufio.CopyConn(ctx, serverConn, conn)
 }
 
-func (c *client) NewPacketConnection(ctx context.Context, conn N.PacketConn, metadata M.Metadata) error {
+func (c *Client) NewPacketConnection(ctx context.Context, conn N.PacketConn, metadata M.Metadata) error {
 	logrus.Info("outbound ", metadata.Protocol, " UDP ", metadata.Source, " ==> ", metadata.Destination)
 	udpConn, err := c.dialer.DialContext(ctx, "udp", c.server.String())
 	if err != nil {
@@ -323,6 +370,16 @@ func (c *client) NewPacketConnection(ctx context.Context, conn N.PacketConn, met
 	}
 	serverConn := c.method.DialPacketConn(udpConn)
 	return bufio.CopyPacketConn(ctx, serverConn, conn)
+}
+
+func (c *Client) WriteIsThreadUnsafe() {
+}
+
+func (c *Client) NewPacket(ctx context.Context, conn N.PacketConn, buffer *buf.Buffer, metadata M.Metadata) error {
+	metadata.Protocol = "tunnel"
+	metadata.Destination = c.tunnel
+	c.tunnelNat.NewPacketDirect(ctx, metadata.Source.AddrPort(), conn, buffer, metadata)
+	return nil
 }
 
 func run(cmd *cobra.Command, flags *flags) {
@@ -337,7 +394,11 @@ func run(cmd *cobra.Command, flags *flags) {
 		logrus.Fatal(err)
 	}
 
-	logrus.Info("mixed server started at ", c.TCPListener.Addr())
+	if c.mixIn != nil {
+		logrus.Info("mixed server started at ", c.mixIn.TCPListener.Addr())
+	} else {
+		logrus.Info("tunnel started at ", c.tcpIn.Addr())
+	}
 
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM)
@@ -346,7 +407,7 @@ func run(cmd *cobra.Command, flags *flags) {
 	c.Close()
 }
 
-func (c *client) HandleError(err error) {
+func (c *Client) HandleError(err error) {
 	common.Close(err)
 	if E.IsClosed(err) {
 		return

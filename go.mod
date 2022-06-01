@@ -11,8 +11,8 @@ require (
 	github.com/openacid/low v0.1.21
 	github.com/oschwald/geoip2-golang v1.7.0
 	github.com/refraction-networking/utls v1.1.0
-	github.com/sagernet/sing v0.0.0-20220601033944-4e04bbd3d84d
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220601034426-ee9be8af94e4
+	github.com/sagernet/sing v0.0.0-20220601075130-066830bbec3b
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220601075242-e4d76a44eb78
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/ulikunitz/xz v0.5.10

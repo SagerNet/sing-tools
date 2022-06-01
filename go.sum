@@ -154,10 +154,10 @@ github.com/refraction-networking/utls v1.1.0 h1:dKXJwSqni/t5csYJ+aQcEgqB7AMWYi6E
 github.com/refraction-networking/utls v1.1.0/go.mod h1:tz9gX959MEFfFN5whTIocCLUG57WiILqtdVxI8c6Wj0=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/sagernet/sing v0.0.0-20220601033944-4e04bbd3d84d h1:BNhKTknI2tBPUOPDV3lcgwOX6iZimL7K3TPdTdp5hiA=
-github.com/sagernet/sing v0.0.0-20220601033944-4e04bbd3d84d/go.mod h1:w2HnJzXKHpD6F5Z/9XlSD4qbcpHY2RSZuQnFzqgELMg=
-github.com/sagernet/sing-shadowsocks v0.0.0-20220601034426-ee9be8af94e4 h1:POJZphM4VaovhB/7GjJTG+pUTcI/Q9jaOHBqTL6jq1E=
-github.com/sagernet/sing-shadowsocks v0.0.0-20220601034426-ee9be8af94e4/go.mod h1:8NNH8ACh+C0oZb4ielvRJHYA4kFmhDdSQxmwAa+N8PM=
+github.com/sagernet/sing v0.0.0-20220601075130-066830bbec3b h1:N/26MV/2ijp9wb5FzrybKevxIyGRoFlqbJhFlyTr9G0=
+github.com/sagernet/sing v0.0.0-20220601075130-066830bbec3b/go.mod h1:w2HnJzXKHpD6F5Z/9XlSD4qbcpHY2RSZuQnFzqgELMg=
+github.com/sagernet/sing-shadowsocks v0.0.0-20220601075242-e4d76a44eb78 h1:PSAA/hB4TSgeCM9eZVEq4KyrFJZzoWPAFelzqsaNbmU=
+github.com/sagernet/sing-shadowsocks v0.0.0-20220601075242-e4d76a44eb78/go.mod h1:477eWd3SLlfgGkuYZ+iUbQgG0cbFTYx5sd8qr4hfADk=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/shurcooL/component v0.0.0-20170202220835-f88ec8f54cc4/go.mod h1:XhFIlyj5a1fBNx5aJTbKoIq0mNaPvOagO+HjB3EtxrY=
 github.com/shurcooL/events v0.0.0-20181021180414-410e4ca65f48/go.mod h1:5u70Mqkb5O5cxEA8nxTsgrgLehJeAw6Oc4Ab1c/P1HM=
