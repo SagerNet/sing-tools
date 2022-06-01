@@ -154,8 +154,8 @@ github.com/refraction-networking/utls v1.1.0 h1:dKXJwSqni/t5csYJ+aQcEgqB7AMWYi6E
 github.com/refraction-networking/utls v1.1.0/go.mod h1:tz9gX959MEFfFN5whTIocCLUG57WiILqtdVxI8c6Wj0=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/sagernet/sing v0.0.0-20220530041323-c82c144a8e00 h1:kQCITv1yBrSSL6RIBPWTe1+goyWLbS4DELWTeRKmoh8=
-github.com/sagernet/sing v0.0.0-20220530041323-c82c144a8e00/go.mod h1:w2HnJzXKHpD6F5Z/9XlSD4qbcpHY2RSZuQnFzqgELMg=
+github.com/sagernet/sing v0.0.0-20220601020835-61db298e6a18 h1:jFCP+0eVgmxgCeo4fmUSG0n09zMN9Pj6gYUwlebQOWo=
+github.com/sagernet/sing v0.0.0-20220601020835-61db298e6a18/go.mod h1:w2HnJzXKHpD6F5Z/9XlSD4qbcpHY2RSZuQnFzqgELMg=
 github.com/sagernet/sing-shadowsocks v0.0.0-20220531032427-182b7837c827 h1:dy8/Ltn4TW8op9esqdXBCuOVuaUSEZW2gCVE609z2UY=
 github.com/sagernet/sing-shadowsocks v0.0.0-20220531032427-182b7837c827/go.mod h1:24Hwpi7iyZ8KSUqV5GpG29xSc8jUfU//RlClJcOqph4=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=

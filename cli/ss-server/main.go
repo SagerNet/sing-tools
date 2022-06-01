@@ -19,6 +19,7 @@ import (
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
+	"github.com/sagernet/sing/common/uot"
 	"github.com/sagernet/sing/transport/tcp"
 	"github.com/sagernet/sing/transport/udp"
 	"github.com/sirupsen/logrus"
@@ -166,6 +167,16 @@ func newServer(f *flags) (*server, error) {
 }
 
 func (s *server) NewConnection(ctx context.Context, conn net.Conn, metadata M.Metadata) error {
+	if metadata.Destination.Fqdn == uot.UOTMagicAddress {
+		logrus.Info("inbound UOT from ", conn.RemoteAddr())
+
+		udpConn, err := net.ListenUDP("udp", nil)
+		if err != nil {
+			return err
+		}
+		return bufio.CopyConn(ctx, conn, uot.NewServerConn(udpConn))
+	}
+
 	logrus.Info("inbound TCP ", conn.RemoteAddr(), " ==> ", metadata.Destination)
 	destConn, err := N.SystemDialer.DialContext(ctx, "tcp", metadata.Destination)
 	if err != nil {
