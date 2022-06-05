@@ -1,4 +1,4 @@
-package main
+package user
 
 import (
 	"io"
@@ -7,76 +7,75 @@ import (
 	"sync/atomic"
 
 	"github.com/sagernet/sing/common/buf"
+	"github.com/sagernet/sing/common/bufio"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
 )
 
-type UserManager struct {
+type TrafficManager[U comparable] struct {
 	access sync.Mutex
-	users  map[int]*User
+	users  map[U]*Traffic
 }
 
-type User struct {
+type Traffic struct {
 	Upload   uint64
 	Download uint64
 }
 
-func NewUserManager() UserManager {
-	return UserManager{
-		users: make(map[int]*User),
+func NewTrafficManager[U comparable]() *TrafficManager[U] {
+	return &TrafficManager[U]{
+		users: make(map[U]*Traffic),
 	}
 }
 
-func (m *UserManager) TrackConnection(userId int, conn net.Conn) net.Conn {
+func (m *TrafficManager[U]) TrackConnection(user U, conn net.Conn) net.Conn {
 	m.access.Lock()
 	defer m.access.Unlock()
-	var user *User
-	if u, loaded := m.users[userId]; loaded {
-		user = u
+	var traffic *Traffic
+	if t, loaded := m.users[user]; loaded {
+		traffic = t
 	} else {
-		user = new(User)
-		m.users[userId] = user
+		traffic = new(Traffic)
+		m.users[user] = traffic
 	}
-	return &TrackConn{conn, user}
+	return &TrackConn{conn, traffic}
 }
 
-func (m *UserManager) TrackPacketConnection(userId int, conn N.PacketConn) N.PacketConn {
+func (m *TrafficManager[U]) TrackPacketConnection(user U, conn N.PacketConn) N.PacketConn {
 	m.access.Lock()
 	defer m.access.Unlock()
-	var user *User
-	if u, loaded := m.users[userId]; loaded {
-		user = u
+	var traffic *Traffic
+	if t, loaded := m.users[user]; loaded {
+		traffic = t
 	} else {
-		user = new(User)
-		m.users[userId] = user
+		traffic = new(Traffic)
+		m.users[user] = traffic
 	}
-	return &TrackPacketConn{conn, user}
+	return &TrackPacketConn{conn, traffic}
 }
 
-func (m *UserManager) ReadTraffics() []UserTraffic {
+func (m *TrafficManager[U]) ReadTraffics() map[U]Traffic {
 	m.access.Lock()
 	defer m.access.Unlock()
 
-	traffic := make([]UserTraffic, 0, len(m.users))
-	for userId, user := range m.users {
-		upload := atomic.SwapUint64(&user.Upload, 0)
-		download := atomic.SwapUint64(&user.Download, 0)
+	trafficMap := make(map[U]Traffic)
+	for user, traffic := range m.users {
+		upload := atomic.SwapUint64(&traffic.Upload, 0)
+		download := atomic.SwapUint64(&traffic.Download, 0)
 		if upload == 0 && download == 0 {
 			continue
 		}
-		traffic = append(traffic, UserTraffic{
-			UID:      userId,
-			Upload:   int64(upload),
-			Download: int64(download),
-		})
+		trafficMap[user] = Traffic{
+			Upload:   upload,
+			Download: download,
+		}
 	}
-
-	return traffic
+	return trafficMap
 }
 
 type TrackConn struct {
 	net.Conn
-	*User
+	*Traffic
 }
 
 func (c *TrackConn) Read(p []byte) (n int, err error) {
@@ -96,7 +95,7 @@ func (c *TrackConn) Write(p []byte) (n int, err error) {
 }
 
 func (c *TrackConn) WriteTo(w io.Writer) (n int64, err error) {
-	n, err = io.Copy(w, c.Conn)
+	n, err = bufio.Copy(w, c.Conn)
 	if n > 0 {
 		atomic.AddUint64(&c.Upload, uint64(n))
 	}
@@ -104,16 +103,20 @@ func (c *TrackConn) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func (c *TrackConn) ReadFrom(r io.Reader) (n int64, err error) {
-	n, err = io.Copy(c.Conn, r)
+	n, err = bufio.Copy(c.Conn, r)
 	if n > 0 {
 		atomic.AddUint64(&c.Download, uint64(n))
 	}
 	return
 }
 
+func (c *TrackConn) Upstream() any {
+	return c.Conn
+}
+
 type TrackPacketConn struct {
 	N.PacketConn
-	*User
+	*Traffic
 }
 
 func (c *TrackPacketConn) ReadPacket(buffer *buf.Buffer) (M.Socksaddr, error) {
@@ -131,4 +134,8 @@ func (c *TrackPacketConn) WritePacket(buffer *buf.Buffer, destination M.Socksadd
 		atomic.AddUint64(&c.Download, uint64(n))
 	}
 	return err
+}
+
+func (c *TrackPacketConn) Upstream() any {
+	return c.PacketConn
 }

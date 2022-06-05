@@ -15,6 +15,7 @@ import (
 	"github.com/sagernet/sing-tools/cli/portal"
 	"github.com/sagernet/sing-tools/extensions/acme"
 	_ "github.com/sagernet/sing-tools/extensions/log"
+	"github.com/sagernet/sing-tools/extensions/user"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/bufio"
 	E "github.com/sagernet/sing/common/exceptions"
@@ -104,7 +105,7 @@ type TrojanInstance struct {
 	listener     net.Listener
 	tlsConfig    tls.Config
 	service      trojan.Service[int]
-	user         UserManager
+	user         *user.TrafficManager[int]
 	reloadTicker *time.Ticker
 }
 
@@ -113,7 +114,7 @@ func NewTrojanInstance(client *NodeClient, node Node) *TrojanInstance {
 		NodeClient: client,
 		id:         node.ID,
 		domain:     node.Domain,
-		user:       NewUserManager(),
+		user:       user.NewTrafficManager[int](),
 	}
 	t.service = trojan.NewService[int](t)
 	return t
@@ -219,7 +220,16 @@ func (i *TrojanInstance) loopReload() {
 		}
 		traffics := i.user.ReadTraffics()
 		if len(traffics) > 0 {
-			err = i.ReportTrojanTraffic(context.Background(), traffics)
+			var userTraffics []UserTraffic
+			for userId, traffic := range traffics {
+				userTraffics = append(userTraffics, UserTraffic{
+					UID:      userId,
+					Upload:   int64(traffic.Upload),
+					Download: int64(traffic.Download),
+				})
+			}
+
+			err = i.ReportTrojanTraffic(context.Background(), userTraffics)
 			if err != nil {
 				i.HandleError(E.Cause(err, "report traffic"))
 			}
