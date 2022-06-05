@@ -6,19 +6,19 @@ require (
 	github.com/cloudflare/cloudflare-go v0.40.0
 	github.com/go-acme/lego/v4 v4.7.0
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/klauspost/compress v1.15.5
+	github.com/klauspost/compress v1.15.6
 	github.com/lucas-clemente/quic-go v0.27.1
 	github.com/openacid/low v0.1.21
 	github.com/oschwald/geoip2-golang v1.7.0
 	github.com/refraction-networking/utls v1.1.0
-	github.com/sagernet/sing v0.0.0-20220601075130-066830bbec3b
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220601075242-e4d76a44eb78
+	github.com/sagernet/sing v0.0.0-20220605012533-e0f722558141
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220605012719-1e22882ea853
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/ulikunitz/xz v0.5.10
 	github.com/v2fly/v2ray-core/v5 v5.0.6
-	github.com/vishvananda/netlink v1.2.0-beta
-	golang.org/x/net v0.0.0-20220526153639-5463443f8c37
+	github.com/vishvananda/netlink v1.2.1-beta.2
+	golang.org/x/net v0.0.0-20220531201128-c960675eff93
 	google.golang.org/protobuf v1.28.0
 	gvisor.dev/gvisor v0.0.0-20220428010907-8082b77961ba
 )
