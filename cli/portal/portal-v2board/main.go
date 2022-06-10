@@ -190,7 +190,7 @@ func (i *TrojanInstance) NewPacketConnection(ctx context.Context, conn N.PacketC
 	if err != nil {
 		return err
 	}
-	return bufio.CopyNetPacketConn(ctx, conn, udpConn)
+	return bufio.CopyPacketConn(ctx, conn, bufio.NewPacketConn(udpConn))
 }
 
 func (i *TrojanInstance) loopRequests() {

@@ -204,7 +204,7 @@ func (s *server) NewPacketConnection(ctx context.Context, conn N.PacketConn, met
 	if err != nil {
 		return err
 	}
-	return bufio.CopyNetPacketConn(ctx, conn, udpConn)
+	return bufio.CopyPacketConn(ctx, conn, bufio.NewPacketConn(udpConn))
 }
 
 func (s *server) HandleError(err error) {
