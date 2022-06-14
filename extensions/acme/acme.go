@@ -18,8 +18,8 @@ import (
 	legoLog "github.com/go-acme/lego/v4/log"
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/sagernet/sing-tools/extensions/log"
-	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
+	"github.com/sagernet/sing/common/rw"
 )
 
 func init() {
@@ -69,7 +69,7 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 	certificatePath := c.path + "/" + domain + ".crt"
 	requestPath := c.path + "/" + domain + ".json"
 
-	if !common.FileExists(accountKeyPath) {
+	if !rw.FileExists(accountKeyPath) {
 		err = writeNewPrivateKey(accountKeyPath)
 		if err != nil {
 			return nil, err
@@ -86,9 +86,9 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 		privateKey: accountKey,
 	}
 
-	if common.FileExists(accountPath) {
+	if rw.FileExists(accountPath) {
 		var account registration.Resource
-		err = common.ReadJSON(accountPath, &account)
+		err = rw.ReadJSON(accountPath, &account)
 		if err != nil {
 			return nil, err
 		}
@@ -114,7 +114,7 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 			return nil, err
 		}
 		user.registration = account
-		err = common.WriteJSON(accountPath, account)
+		err = rw.WriteJSON(accountPath, account)
 		if err != nil {
 			return nil, err
 		}
@@ -135,9 +135,9 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 		}
 	}
 
-	if renew && common.FileExists(requestPath) {
+	if renew && rw.FileExists(requestPath) {
 		var request Certificate
-		err = common.ReadJSON(requestPath, &request)
+		err = rw.ReadJSON(requestPath, &request)
 		if err != nil {
 			return nil, err
 		}
@@ -145,7 +145,7 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 		if err != nil {
 			return nil, err
 		}
-		err = common.WriteJSON(requestPath, (*Certificate)(newCert))
+		err = rw.WriteJSON(requestPath, (*Certificate)(newCert))
 		if err != nil {
 			return nil, err
 		}
@@ -174,8 +174,8 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 		goto finish
 	}
 
-	if !common.FileExists(certificatePath) {
-		if !common.FileExists(privateKeyPath) {
+	if !rw.FileExists(certificatePath) {
+		if !rw.FileExists(privateKeyPath) {
 			err = writeNewPrivateKey(privateKeyPath)
 			if err != nil {
 				return nil, err
@@ -196,7 +196,7 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 		if err != nil {
 			return nil, err
 		}
-		err = common.WriteJSON(requestPath, (*Certificate)(certificates))
+		err = rw.WriteJSON(requestPath, (*Certificate)(certificates))
 		if err != nil {
 			return nil, err
 		}
@@ -298,7 +298,7 @@ func writeNewPrivateKey(path string) error {
 	if err != nil {
 		return err
 	}
-	return common.WriteFile(path, pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: pkcsBytes}))
+	return rw.WriteFile(path, pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: pkcsBytes}))
 }
 
 type Certificate struct {

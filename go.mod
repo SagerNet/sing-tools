@@ -11,14 +11,14 @@ require (
 	github.com/openacid/low v0.1.21
 	github.com/oschwald/geoip2-golang v1.7.0
 	github.com/refraction-networking/utls v1.1.0
-	github.com/sagernet/sing v0.0.0-20220614091938-64835a637bdc
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220614094139-78976745aad2
+	github.com/sagernet/sing v0.0.0-20220618075133-daf15b03b7fc
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220618054131-26575402e011
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/ulikunitz/xz v0.5.10
 	github.com/v2fly/v2ray-core/v5 v5.0.7
 	github.com/vishvananda/netlink v1.2.1-beta.2
-	golang.org/x/net v0.0.0-20220607020251-c690dde0001d
+	golang.org/x/net v0.0.0-20220617184016-355a448f1bc9
 	google.golang.org/protobuf v1.28.0
 	gvisor.dev/gvisor v0.0.0-20220428010907-8082b77961ba
 )
@@ -47,7 +47,7 @@ require (
 	github.com/vishvananda/netns v0.0.0-20211101163701-50045581ed74 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d // indirect
+	golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	golang.org/x/tools v0.1.11-0.20220325154526-54af36eca237 // indirect

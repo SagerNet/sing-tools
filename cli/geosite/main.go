@@ -3,13 +3,14 @@ package main
 import (
 	"bytes"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 
 	"github.com/sagernet/sing-tools/extensions/geosite"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
-	N "github.com/sagernet/sing/common/network"
+	"github.com/sagernet/sing/common/rw"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/ulikunitz/xz"
@@ -113,7 +114,7 @@ find:
 			"/opt/share/v2ray",
 		} {
 			file := dir + "/geosite.dat"
-			if common.FileExists(file) {
+			if rw.FileExists(file) {
 				resource = file
 				break find
 			}
@@ -125,10 +126,14 @@ find:
 	}
 
 	var data []byte
-	var err error
 	if strings.HasPrefix(resource, "http://") || strings.HasPrefix(resource, "https://") {
 		logrus.Info("download ", resource)
-		data, err = N.Get(resource)
+		response, err := http.Get(resource)
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		data, err = ioutil.ReadAll(response.Body)
+		response.Body.Close()
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -155,7 +160,7 @@ find:
 	loaded := make(map[string][]string)
 	{
 		geositeList := routercommon.GeoSiteList{}
-		err = proto.Unmarshal(data, &geositeList)
+		err := proto.Unmarshal(data, &geositeList)
 		if err == nil {
 			for _, geoSite := range geositeList.Entry {
 				domains := make([]string, 0, len(geoSite.Domain))
