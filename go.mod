@@ -6,6 +6,7 @@ require (
 	github.com/cloudflare/cloudflare-go v0.41.0
 	github.com/go-acme/lego/v4 v4.7.0
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/gorilla/websocket v1.5.0
 	github.com/klauspost/compress v1.15.6
 	github.com/lucas-clemente/quic-go v0.27.2
 	github.com/openacid/low v0.1.21
