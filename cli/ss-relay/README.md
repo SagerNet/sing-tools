@@ -1,4 +1,4 @@
-# ss-server
+# ss-relay
 
 ## Requirements
 
@@ -12,24 +12,24 @@
 git clone https://github.com/SagerNet/sing-tools sing
 cd sing
 
-cli/ss-server/install.sh
-cli/ss-server/enable.sh
+cli/ss-relay/install.sh
+cli/ss-relay/enable.sh
 ```
 
 ## Log
 
 ```shell
-sudo journalctl -u ss --output cat -f
+sudo journalctl -u ss-relay --output cat -f
 ```
 
 ## Update
 
 ```shell
-cli/ss-server/update.sh
+cli/ss-relay/update.sh
 ```
 
 ## Uninstall
 
 ```shell
-cli/ss-server/uninstall.sh
+cli/ss-relay/uninstall.sh
 ```

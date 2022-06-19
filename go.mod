@@ -8,12 +8,13 @@ require (
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/klauspost/compress v1.15.6
+	github.com/klauspost/cpuid/v2 v2.0.12
 	github.com/lucas-clemente/quic-go v0.27.2
 	github.com/openacid/low v0.1.21
 	github.com/oschwald/geoip2-golang v1.7.0
 	github.com/refraction-networking/utls v1.1.0
-	github.com/sagernet/sing v0.0.0-20220618075133-daf15b03b7fc
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220618054131-26575402e011
+	github.com/sagernet/sing v0.0.0-20220619130320-8793fe5e067d
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220619134218-830a2f478eb1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/ulikunitz/xz v0.5.10
@@ -34,7 +35,6 @@ require (
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/klauspost/cpuid/v2 v2.0.12 // indirect
 	github.com/marten-seemann/qpack v0.2.1 // indirect
 	github.com/marten-seemann/qtls-go1-16 v0.1.5 // indirect
 	github.com/marten-seemann/qtls-go1-17 v0.1.2 // indirect
