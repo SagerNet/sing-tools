@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
-	"runtime/debug"
 	"strings"
 	"syscall"
 	"time"
@@ -20,8 +19,6 @@ import (
 	"github.com/sagernet/sing-shadowsocks/shadowaead_2022"
 	"github.com/sagernet/sing-shadowsocks/shadowimpl"
 	"github.com/sagernet/sing-shadowsocks/shadowstream"
-	"github.com/sagernet/sing-tools/extensions/geoip"
-	"github.com/sagernet/sing-tools/extensions/geosite"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/buf"
 	"github.com/sagernet/sing/common/bufio"
@@ -40,9 +37,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const udpTimeout = 5 * 60
-
-type flags struct {
+type Flags struct {
 	Server     string `json:"server"`
 	ServerPort uint16 `json:"server_port"`
 	Bind       string `json:"local_address"`
@@ -55,13 +50,12 @@ type flags struct {
 	Verbose     bool   `json:"verbose"`
 	Transproxy  string `json:"transproxy"`
 	FWMark      int    `json:"fwmark"`
-	Bypass      string `json:"bypass"`
 	Tunnel      string `json:"tunnel"`
 	ConfigFile  string
 }
 
 func main() {
-	f := new(flags)
+	f := new(Flags)
 
 	command := &cobra.Command{
 		Use:   "ss-local",
@@ -89,7 +83,6 @@ func main() {
 	command.Flags().StringVar(&f.Tunnel, "tunnel", "", "Enable tunnel mode.")
 	command.Flags().StringVarP(&f.Transproxy, "transproxy", "t", "", "Enable transparent proxy support. [possible values: redirect, tproxy]")
 	command.Flags().IntVar(&f.FWMark, "fwmark", 0, "Store outbound socket mark.")
-	command.Flags().StringVar(&f.Bypass, "bypass", "", "Store bypass country.")
 	command.Flags().StringVarP(&f.ConfigFile, "config", "c", "", "Use a configuration file.")
 	command.Flags().BoolVarP(&f.Verbose, "verbose", "v", false, "Enable verbose mode.")
 	err := command.Execute()
@@ -99,14 +92,12 @@ func main() {
 }
 
 type Client struct {
-	mixIn *mixed.Listener
-	tcpIn *tcp.Listener
-	udpIn *udp.Listener
-	*geosite.Matcher
+	mixIn     *mixed.Listener
+	tcpIn     *tcp.Listener
+	udpIn     *udp.Listener
 	server    M.Socksaddr
 	method    shadowsocks.Method
 	dialer    net.Dialer
-	bypass    string
 	isTunnel  bool
 	tunnel    M.Socksaddr
 	tunnelNat *udpnat.Service[netip.AddrPort]
@@ -132,13 +123,13 @@ func (c *Client) Close() error {
 	}
 }
 
-func newClient(f *flags) (*Client, error) {
+func newClient(f *Flags) (*Client, error) {
 	if f.ConfigFile != "" {
 		configFile, err := ioutil.ReadFile(f.ConfigFile)
 		if err != nil {
 			return nil, E.Cause(err, "read config file")
 		}
-		flagsNew := new(flags)
+		flagsNew := new(Flags)
 		err = json.Unmarshal(configFile, flagsNew)
 		if err != nil {
 			return nil, E.Cause(err, "decode config file")
@@ -193,7 +184,6 @@ func newClient(f *flags) (*Client, error) {
 
 	c := &Client{
 		server: M.ParseSocksaddrHostPort(f.Server, f.ServerPort),
-		bypass: f.Bypass,
 		dialer: net.Dialer{
 			Timeout: 5 * time.Second,
 		},
@@ -211,6 +201,7 @@ func newClient(f *flags) (*Client, error) {
 		}
 		c.method = method
 	}
+	const udpTimeout = 5 * 60
 
 	c.dialer.Control = func(network, address string, c syscall.RawConn) error {
 		var rawFd uintptr
@@ -269,30 +260,6 @@ func newClient(f *flags) (*Client, error) {
 		c.tunnelNat = udpnat.New[netip.AddrPort](500, c)
 	}
 
-	if f.Bypass != "" {
-		err := geoip.LoadMMDB("Country.mmdb")
-		if err != nil {
-			return nil, E.Cause(err, "load Country.mmdb")
-		}
-
-		geodata, err := os.Open("geosite.dat")
-		if err != nil {
-			return nil, E.Cause(err, "geosite.dat not found")
-		}
-
-		site, err := geosite.ReadArray(geodata, f.Bypass)
-		if err != nil {
-			return nil, err
-		}
-
-		geositeMatcher, err := geosite.NewMatcher(site)
-		if err != nil {
-			return nil, err
-		}
-		c.Matcher = geositeMatcher
-	}
-	debug.FreeOSMemory()
-
 	return c, nil
 }
 
@@ -318,18 +285,6 @@ func (c *Client) NewConnection(ctx context.Context, conn net.Conn, metadata M.Me
 	if c.isTunnel {
 		metadata.Protocol = "tunnel"
 		metadata.Destination = c.tunnel
-	}
-
-	if c.bypass != "" {
-		if metadata.Destination.Family().IsFqdn() {
-			if c.Match(metadata.Destination.Fqdn) {
-				return bypass(conn, metadata.Destination)
-			}
-		} else {
-			if geoip.Match(c.bypass, metadata.Destination.Addr.AsSlice()) {
-				return bypass(conn, metadata.Destination)
-			}
-		}
 	}
 
 	logrus.Info("outbound ", metadata.Protocol, " TCP ", conn.RemoteAddr(), " ==> ", metadata.Destination)
@@ -382,7 +337,7 @@ func (c *Client) NewPacket(ctx context.Context, conn N.PacketConn, buffer *buf.B
 	return nil
 }
 
-func run(cmd *cobra.Command, flags *flags) {
+func run(cmd *cobra.Command, flags *Flags) {
 	c, err := newClient(flags)
 	if err != nil {
 		logrus.StandardLogger().Log(logrus.FatalLevel, err, "\n\n")
