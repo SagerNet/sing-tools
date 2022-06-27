@@ -3,24 +3,24 @@ module github.com/sagernet/sing-tools
 go 1.18
 
 require (
-	github.com/cloudflare/cloudflare-go v0.41.0
+	github.com/cloudflare/cloudflare-go v0.43.0
 	github.com/go-acme/lego/v4 v4.7.0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/klauspost/compress v1.15.6
-	github.com/klauspost/cpuid/v2 v2.0.13
+	github.com/klauspost/cpuid/v2 v2.0.14
 	github.com/lucas-clemente/quic-go v0.27.2
 	github.com/openacid/low v0.1.21
 	github.com/oschwald/geoip2-golang v1.7.0
 	github.com/refraction-networking/utls v1.1.0
-	github.com/sagernet/sing v0.0.0-20220620074945-99754098d119
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220619134218-830a2f478eb1
+	github.com/sagernet/sing v0.0.0-20220627092450-605697c1aec0
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220627120956-6d5e7fb635f8
 	github.com/sirupsen/logrus v1.8.1
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 	github.com/ulikunitz/xz v0.5.10
 	github.com/v2fly/v2ray-core/v5 v5.0.7
 	github.com/vishvananda/netlink v1.2.1-beta.2
-	golang.org/x/net v0.0.0-20220617184016-355a448f1bc9
+	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e
 	google.golang.org/protobuf v1.28.0
 	gvisor.dev/gvisor v0.0.0-20220428010907-8082b77961ba
 )
