@@ -135,10 +135,10 @@ github.com/prometheus/common v0.0.0-20180801064454-c7de2306084e/go.mod h1:daVV7q
 github.com/prometheus/procfs v0.0.0-20180725123919-05ee40e3a273/go.mod h1:c3At6R/oaqEKCNdg8wHV1ftS6bRYblBhIjjI8uT2IGk=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/sagernet/sing v0.0.0-20220627092450-605697c1aec0 h1:WRc+FBhOM12FwVphxpRgPLcr9+9JmFLuDKIBtoSrvwk=
-github.com/sagernet/sing v0.0.0-20220627092450-605697c1aec0/go.mod h1:I67R/q5f67xDExL2kL3RLIP7kGJBOPkYXkpRAykgC+E=
-github.com/sagernet/sing-shadowsocks v0.0.0-20220627120956-6d5e7fb635f8 h1:Pw6YGheeHOkFGZsqx3vORPKNOEGmXzApG4/N5oXf9wU=
-github.com/sagernet/sing-shadowsocks v0.0.0-20220627120956-6d5e7fb635f8/go.mod h1:ipBrOWuP0+88yZ3+Ml7/gefRkD7m95Zg/EFA+tEhvNk=
+github.com/sagernet/sing v0.0.0-20220627234642-a817f7084d9c h1:98QC0wtaD648MFPw82KaT1O9LloQgR4ZyIDtNtsno8Y=
+github.com/sagernet/sing v0.0.0-20220627234642-a817f7084d9c/go.mod h1:I67R/q5f67xDExL2kL3RLIP7kGJBOPkYXkpRAykgC+E=
+github.com/sagernet/sing-shadowsocks v0.0.0-20220627234717-689e0165ef2c h1:Jhgjyb2jXL4GtwJec6/kgeTqaQXsvMiNX2wAkGOSD3I=
+github.com/sagernet/sing-shadowsocks v0.0.0-20220627234717-689e0165ef2c/go.mod h1:ng5pxdNnKZWlxzZTXRqWeY0ftzhScPZmjgJGJeRuPYY=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/shurcooL/component v0.0.0-20170202220835-f88ec8f54cc4/go.mod h1:XhFIlyj5a1fBNx5aJTbKoIq0mNaPvOagO+HjB3EtxrY=
 github.com/shurcooL/events v0.0.0-20181021180414-410e4ca65f48/go.mod h1:5u70Mqkb5O5cxEA8nxTsgrgLehJeAw6Oc4Ab1c/P1HM=

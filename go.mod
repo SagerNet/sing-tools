@@ -7,8 +7,8 @@ require (
 	github.com/go-acme/lego/v4 v4.7.0
 	github.com/klauspost/cpuid/v2 v2.0.14
 	github.com/lucas-clemente/quic-go v0.27.2
-	github.com/sagernet/sing v0.0.0-20220627092450-605697c1aec0
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220627120956-6d5e7fb635f8
+	github.com/sagernet/sing v0.0.0-20220627234642-a817f7084d9c
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220627234717-689e0165ef2c
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.5.0
 	github.com/vishvananda/netlink v1.2.1-beta.2
