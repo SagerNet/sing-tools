@@ -57,6 +57,9 @@ func testSocksTCP() error {
 		Class: dnsmessage.ClassINET,
 	})
 	packet, err := message.Pack()
+	if err != nil {
+		return err
+	}
 
 	err = binary.Write(tcpConn, binary.BigEndian, uint16(len(packet)))
 	if err != nil {

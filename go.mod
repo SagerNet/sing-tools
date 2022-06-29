@@ -7,8 +7,8 @@ require (
 	github.com/go-acme/lego/v4 v4.7.0
 	github.com/klauspost/cpuid/v2 v2.0.14
 	github.com/lucas-clemente/quic-go v0.27.2
-	github.com/sagernet/sing v0.0.0-20220627234642-a817f7084d9c
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220627234717-689e0165ef2c
+	github.com/sagernet/sing v0.0.0-20220629062215-880f405c03bc
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220629043611-ad926ed7927f
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.5.0
 	github.com/vishvananda/netlink v1.2.1-beta.2
@@ -33,9 +33,9 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/vishvananda/netns v0.0.0-20211101163701-50045581ed74 // indirect
-	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c // indirect
+	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	golang.org/x/tools v0.1.11-0.20220325154526-54af36eca237 // indirect

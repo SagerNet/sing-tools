@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"net"
 	"net/netip"
@@ -26,8 +25,6 @@ import (
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
 	"github.com/sagernet/sing/common/redir"
-	"github.com/sagernet/sing/common/rw"
-	"github.com/sagernet/sing/common/task"
 	"github.com/sagernet/sing/common/udpnat"
 	"github.com/sagernet/sing/transport/mixed"
 	"github.com/sagernet/sing/transport/system"
@@ -167,7 +164,6 @@ func newClient(f *Flags) (*Client, error) {
 		if flagsNew.Verbose {
 			f.Verbose = true
 		}
-
 	}
 
 	if f.Verbose {
@@ -201,7 +197,6 @@ func newClient(f *Flags) (*Client, error) {
 		}
 		c.method = method
 	}
-	const udpTimeout = 5 * 60
 
 	c.dialer.Control = func(network, address string, c syscall.RawConn) error {
 		var rawFd uintptr
@@ -251,7 +246,7 @@ func newClient(f *Flags) (*Client, error) {
 			return nil, E.New("unknown transproxy mode ", f.Transproxy)
 		}
 
-		c.mixIn = mixed.NewListener(bind, nil, transproxyMode, udpTimeout, c)
+		c.mixIn = mixed.NewListener(bind, nil, transproxyMode, 300, c)
 	} else {
 		c.isTunnel = true
 		c.tunnel = M.ParseSocksaddr(f.Tunnel)
@@ -261,24 +256,6 @@ func newClient(f *Flags) (*Client, error) {
 	}
 
 	return c, nil
-}
-
-func bypass(conn net.Conn, destination M.Socksaddr) error {
-	logrus.Info("BYPASS ", conn.RemoteAddr(), " ==> ", destination)
-	serverConn, err := net.Dial("tcp", destination.String())
-	if err != nil {
-		return err
-	}
-	defer common.Close(conn, serverConn)
-	return task.Run(context.Background(), func() error {
-		defer rw.CloseRead(conn)
-		defer rw.CloseWrite(serverConn)
-		return common.Error(io.Copy(serverConn, conn))
-	}, func() error {
-		defer rw.CloseRead(serverConn)
-		defer rw.CloseWrite(conn)
-		return common.Error(io.Copy(conn, serverConn))
-	})
 }
 
 func (c *Client) NewConnection(ctx context.Context, conn net.Conn, metadata M.Metadata) error {

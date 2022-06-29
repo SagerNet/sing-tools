@@ -30,7 +30,7 @@ func GenerateCertificate(hosts ...string) (*tls.Certificate, error) {
 	createAt = createAt.Add(-(time.Duration(r.Intn(1000)) * time.Millisecond))
 	createAt = createAt.Add(-(time.Duration(r.Intn(1000)) * time.Microsecond))
 
-	endAt := createAt.AddDate(0, (r.Intn(1)+1)*6, 0)
+	endAt := createAt.AddDate(0, (r.Intn(2)+1)*6, 0)
 
 	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)

@@ -20,6 +20,7 @@ import (
 	"github.com/sagernet/sing-tools/extensions/log"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/rw"
+	"github.com/sagernet/sing/common/x/list"
 )
 
 func init() {
@@ -33,22 +34,21 @@ type CertificateManager struct {
 	path     string
 	provider string
 
-	access    sync.Mutex
-	callbacks map[string][]CertificateUpdateListener
-	renew     *time.Ticker
+	access     sync.Mutex
+	callbacks  map[string]*list.List[CertificateUpdateListener]
+	renewClose chan struct{}
 }
 
 func NewCertificateManager(settings *Settings) *CertificateManager {
 	m := &CertificateManager{
-		email:    settings.Email,
-		path:     settings.DataDirectory,
-		provider: settings.DNSProvider,
-		renew:    time.NewTicker(time.Hour * 24),
+		email:     settings.Email,
+		path:      settings.DataDirectory,
+		provider:  settings.DNSProvider,
+		callbacks: make(map[string]*list.List[CertificateUpdateListener]),
 	}
 	if m.path == "" {
 		m.path = "acme"
 	}
-	go m.loopRenew()
 	return m
 }
 
@@ -126,7 +126,7 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 		cert, err := x509.ParseCertificate(keyPair.Certificate[0])
 		if err == nil {
 			keyPair.Leaf = cert
-			expiresDays := cert.NotAfter.Sub(time.Now()).Hours() / 24
+			expiresDays := time.Until(cert.NotAfter).Hours() / 24
 			if expiresDays > 15 {
 				return &keyPair, nil
 			} else {
@@ -161,7 +161,7 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 		if certResponse.StatusCode != 200 {
 			return nil, E.New("HTTP ", certResponse.StatusCode, ": ", string(content))
 		}
-		err = ioutil.WriteFile(certificatePath, content, 0o644)
+		err = rw.WriteFile(certificatePath, content)
 		if err != nil {
 			return nil, err
 		}
@@ -212,7 +212,7 @@ func (c *CertificateManager) GetKeyPair(domain string) (*tls.Certificate, error)
 		if certResponse.StatusCode != 200 {
 			return nil, E.New("HTTP ", certResponse.StatusCode, ": ", string(content))
 		}
-		err = ioutil.WriteFile(certificatePath, content, 0o644)
+		err = rw.WriteFile(certificatePath, content)
 		if err != nil {
 			return nil, err
 		}
@@ -225,37 +225,69 @@ finish:
 	}
 
 	c.access.Lock()
-	for _, listener := range c.callbacks[domain] {
-		listener(&keyPair)
+	listeners := c.callbacks[domain]
+	if listeners != nil {
+		for listener := listeners.Front(); listener != nil; listener = listener.Next() {
+			listener.Value(&keyPair)
+		}
 	}
 	c.access.Unlock()
 
 	return &keyPair, nil
 }
 
-func (c *CertificateManager) RegisterUpdateListener(domain string, listener CertificateUpdateListener) {
+func (c *CertificateManager) RegisterUpdateListener(domain string, listener CertificateUpdateListener) *list.Element[CertificateUpdateListener] {
 	c.access.Lock()
 	defer c.access.Unlock()
-
-	if c.callbacks == nil {
-		c.callbacks = make(map[string][]CertificateUpdateListener)
+	listeners := c.callbacks[domain]
+	if listeners != nil {
+		listeners = new(list.List[CertificateUpdateListener])
+		c.callbacks[domain] = listeners
 	}
-	c.callbacks[domain] = append(c.callbacks[domain], listener)
+	element := listeners.PushBack(listener)
+	if c.renewClose == nil {
+		c.start()
+	}
+	return element
 }
 
-func (c *CertificateManager) loopRenew() {
-	for range c.renew.C {
-		c.access.Lock()
-		domains := make([]string, 0, len(c.callbacks))
-		for domain := range c.callbacks {
-			domains = append(domains, domain)
-		}
-		c.access.Unlock()
-
-		for _, domain := range domains {
-			_, _ = c.GetKeyPair(domain)
+func (c *CertificateManager) UnregisterUpdateListener(element *list.Element[CertificateUpdateListener]) {
+	c.access.Lock()
+	defer c.access.Unlock()
+	element.List().Remove(element)
+	for _, listeners := range c.callbacks {
+		if listeners.Len() > 0 {
+			return
 		}
 	}
+	renewClose := c.renewClose
+	if renewClose != nil {
+		close(renewClose)
+		c.renewClose = nil
+	}
+}
+
+func (c *CertificateManager) start() {
+	renew := time.NewTicker(time.Hour * 24)
+	defer renew.Stop()
+	renewClose := make(chan struct{})
+	c.renewClose = renewClose
+	go func() {
+		select {
+		case <-renew.C:
+			c.access.Lock()
+			domains := make([]string, 0, len(c.callbacks))
+			for domain := range c.callbacks {
+				domains = append(domains, domain)
+			}
+			c.access.Unlock()
+			for _, domain := range domains {
+				_, _ = c.GetKeyPair(domain)
+			}
+		case <-renewClose:
+			return
+		}
+	}()
 }
 
 type acmeUser struct {

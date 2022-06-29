@@ -23,8 +23,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const udpTimeout = 5 * 60
-
 type Flags struct {
 	Server     string        `json:"server"`
 	ServerPort uint16        `json:"server_port"`
@@ -131,7 +129,7 @@ func newServer(f *Flags) (*server, error) {
 		return nil, E.New("missing method")
 	}
 
-	service, err := shadowaead_2022.NewRelayServiceWithPassword[int](f.Method, f.Password, udpTimeout, s)
+	service, err := shadowaead_2022.NewRelayServiceWithPassword[int](f.Method, f.Password, 300, s)
 	if err != nil {
 		return nil, err
 	}

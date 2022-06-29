@@ -26,9 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const udpTimeout = 5 * 60
-
-type flags struct {
+type Flags struct {
 	Server     string `json:"server"`
 	ServerPort uint16 `json:"server_port"`
 	Bind       string `json:"local_address"`
@@ -65,7 +63,7 @@ func run(cmd *cobra.Command, args []string) {
 		logrus.Fatal(E.Cause(err, "read config file"))
 	}
 
-	f := new(flags)
+	f := new(Flags)
 	err = json.Unmarshal(configFile, f)
 	if err != nil {
 		logrus.Fatal(E.Cause(err, "parse config file"))
@@ -118,7 +116,7 @@ func (s *server) Close() error {
 	return nil
 }
 
-func newServer(f *flags) (*server, error) {
+func newServer(f *Flags) (*server, error) {
 	s := new(server)
 
 	if f.Server == "" {
@@ -134,15 +132,15 @@ func newServer(f *flags) (*server, error) {
 	}
 
 	if f.Method == shadowsocks.MethodNone {
-		s.service = shadowsocks.NewNoneService(udpTimeout, s)
+		s.service = shadowsocks.NewNoneService(300, s)
 	} else if common.Contains(shadowaead.List, f.Method) {
-		service, err := shadowaead.NewService(f.Method, nil, f.Password, udpTimeout, s)
+		service, err := shadowaead.NewService(f.Method, nil, f.Password, 300, s)
 		if err != nil {
 			return nil, err
 		}
 		s.service = service
 	} else if common.Contains(shadowaead_2022.List, f.Method) {
-		service, err := shadowaead_2022.NewServiceWithPassword(f.Method, f.Password, udpTimeout, s)
+		service, err := shadowaead_2022.NewServiceWithPassword(f.Method, f.Password, 300, s)
 		if err != nil {
 			return nil, err
 		}

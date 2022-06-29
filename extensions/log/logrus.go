@@ -28,7 +28,6 @@ func (h *TaggedHook) Fire(entry *logrus.Entry) error {
 		delete(entry.Data, "tag")
 		entry.Message = strings.ReplaceAll(entry.Message, tag+": ", "")
 		entry.Message = "[" + tag + "]: " + entry.Message
-
 	}
 	return nil
 }
