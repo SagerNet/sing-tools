@@ -18,18 +18,17 @@ import (
 	"github.com/sagernet/sing-shadowsocks/shadowaead_2022"
 	"github.com/sagernet/sing-shadowsocks/shadowimpl"
 	"github.com/sagernet/sing-shadowsocks/shadowstream"
+	"github.com/sagernet/sing-tools/extensions/redir"
+	"github.com/sagernet/sing-tools/extensions/transport/mixed"
+	"github.com/sagernet/sing-tools/extensions/transport/tcp"
+	"github.com/sagernet/sing-tools/extensions/transport/udp"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/buf"
 	"github.com/sagernet/sing/common/bufio"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
-	"github.com/sagernet/sing/common/redir"
 	"github.com/sagernet/sing/common/udpnat"
-	"github.com/sagernet/sing/transport/mixed"
-	"github.com/sagernet/sing/transport/system"
-	"github.com/sagernet/sing/transport/tcp"
-	"github.com/sagernet/sing/transport/udp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -208,12 +207,6 @@ func newClient(f *Flags) (*Client, error) {
 		}
 		if f.FWMark > 0 {
 			err = redir.FWMark(rawFd, f.FWMark)
-			if err != nil {
-				return err
-			}
-		}
-		if f.TCPFastOpen {
-			err = system.TCPFastOpen(rawFd)
 			if err != nil {
 				return err
 			}

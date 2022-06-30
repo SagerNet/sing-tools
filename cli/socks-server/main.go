@@ -8,13 +8,13 @@ import (
 	"syscall"
 
 	"github.com/go-acme/lego/v4/log"
+	"github.com/sagernet/sing-tools/extensions/redir"
+	"github.com/sagernet/sing-tools/extensions/transport/mixed"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/bufio"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
-	"github.com/sagernet/sing/common/redir"
-	"github.com/sagernet/sing/transport/mixed"
 )
 
 func main() {

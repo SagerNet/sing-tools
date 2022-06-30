@@ -137,6 +137,8 @@ github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sagernet/sing v0.0.0-20220629062215-880f405c03bc h1:roqZzbAz2dpzd4BF4Dsk52UdyOzqxmEPbx95MfjfMvs=
 github.com/sagernet/sing v0.0.0-20220629062215-880f405c03bc/go.mod h1:lR0Mc9cBSAgFLGgXWtj5D1X191KeQ/S+LHOhRhuINBo=
+github.com/sagernet/sing v0.0.0-20220630093941-ddfe73e8998a h1:py5+WtmOVX/863XJ+b4HejPRxADGM8E+JvEE1FXXiLg=
+github.com/sagernet/sing v0.0.0-20220630093941-ddfe73e8998a/go.mod h1:3ZmoGNg/nNJTyHAZFNRSPaXpNIwpDvyIiAUd0KIWV5c=
 github.com/sagernet/sing-shadowsocks v0.0.0-20220629043611-ad926ed7927f h1:4C22RLhQgl5Le3DbXyKpGAJpq642h7k8H/EayDCozzc=
 github.com/sagernet/sing-shadowsocks v0.0.0-20220629043611-ad926ed7927f/go.mod h1:CWcPRALGXdNlZjfOebtlyueolJ9OLkmcWMkGte9MIMU=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
