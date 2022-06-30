@@ -5,9 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
+	"net"
 	"os"
 
 	"github.com/sagernet/sing/common"
+	M "github.com/sagernet/sing/common/metadata"
 )
 
 type Flags struct {
@@ -22,9 +24,14 @@ func main() {
 	password := make([]byte, 16)
 	common.Must1(io.ReadFull(rand.Reader, password))
 
+	tcpListener, err := net.ListenTCP("tcp", nil)
+	common.Must(err)
+	port := M.SocksaddrFromNet(tcpListener.Addr()).Port
+	tcpListener.Close()
+
 	f := new(Flags)
 	f.Server = "::"
-	f.ServerPort = 8080
+	f.ServerPort = port
 	f.Password = base64.StdEncoding.EncodeToString(password)
 	f.Method = "2022-blake3-aes-128-gcm"
 	f.LogLevel = "warn"
